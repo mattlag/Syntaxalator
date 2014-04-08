@@ -2,10 +2,10 @@
 	console.log('\nsyntaxalator.js');
 
 	// These entries will style default elements of JavaScript
-	var map = {
+	var styleMap = {
 		"strings":"color:orange;",
 		"numbers":"color:orange;",
-		"comments":"color:gray;",
+		"comments":"color:slategray;",
 		"punctuators":"color:red;",
 		"literals":"color:pink;",
 		"reserved":"color:orange;"
@@ -13,7 +13,7 @@
 
 	// This array holds custom mappings, where 'words' is an array of target keywords
 	// Custom mappings will override any default styles
-	map.custom = [
+	styleMap.custom = [
 		{
 		"words": ["function", "prototype"],
 		"style": "color:blue; font-weight:bold;"
@@ -21,30 +21,30 @@
 	];
 
 	// Some reusable styling
-	var styles = {
+	var resultStyles = {
 		"bounding_box":"border:1px solid rgb(230,238,240);",
 		"line_number":"background-color:rgb(230,238,240); color:rgb(180,188,190); font-size:.6em;",
 		"code_default":"font-family:monospace; color:rgb(20,28,30); background-color:rgb(250,250,250);"
 	};
 
 	//http://es5.github.io/#x7.6.1
-	var list = {
+	var keywordLists = {
 		"reserved":"break,do,instanceof,typeof,case,else,new,var,catch,finally,return,void,continue,for,switch,while,debugger,function,this,with,default,if,throw,delete,in,try,class,enum,extends,super,const,export,import,implements,let,private,public,yield,interface,package,protected,static".split(','),
 		"punctuators":"{,},(,),[,],.,;,<,>,<=,>=,==,!=,===,!==,+,-,*,%,++,--,<<,>>,>>>,&,|,^,!,~,&&,||,?,:,=,+=,-=,*=,%=,<<=,>>=,>>>=,&=,|=,^=".split(','),
 		"literals":"null,true,false".split(',')
 	};
-	list.punctuators.push(',');
+	keywordLists.punctuators.push(',');
 
 	// Wait for the DOM
 	var iid = setInterval((function(){
 		if(document.readyState === "complete"){
 			clearInterval(iid);
-			handleAllCodeBlocks();
+			makeAllCodeBlocks();
 		}
 	}), 11);
 
 	// Grab the target elements, start the loop
-	function handleAllCodeBlocks(){
+	function makeAllCodeBlocks(){
 		// Make sure we can get the classes
 		if(!document.getElementsByClassName) {
 			console.log('\nNo getElementsByClassName, adding to document...');
@@ -63,11 +63,11 @@
 		var targets = document.getElementsByClassName('syntaxalator');
 		console.log('\nTargets length ' + targets.length);
 
-		// Loop through and handle
+		// Loop through and make
 		var prettycode, newnode;
 		for(var t=0; t<targets.length; t++) {
 			console.log('\nHandling Code Block\n'+targets[t].innerHTML);
-			prettycode = handleCodeBlock(targets[t].innerHTML);
+			prettycode = makeCodeBlock(targets[t].innerHTML);
 			newnode = document.createElement('div');
 			newnode.innerHTML = prettycode;
 			document.body.insertBefore(newnode, targets[t]);
@@ -75,8 +75,8 @@
 		}
 	}
 
-	// Handle Code Block
-	function handleCodeBlock(code){
+	// make Code Block
+	function makeCodeBlock(code){
 		var lines = code.split('\n');
 
 		// un-indent
@@ -89,46 +89,19 @@
 
 		var padrow = '<tr><td class="line_number" style="height:.1em;"></td><td class="code_default"></td></tr>\n';
 		result += '<style>'+
-			'.code_table {border-collapse:collapse; '+styles.bounding_box+'}\n'+
+			'.code_table {border-collapse:collapse; '+resultStyles.bounding_box+'}\n'+
 			'.code_table td {padding:4px 12px 4px 8px;}\n'+
-			'.line_number {vertical-align:top; '+styles.line_number+'}\n'+
-			'.code_default, .code_default span {vertical-align:top; '+styles.code_default+'}'+
+			'.line_number {vertical-align:top; '+resultStyles.line_number+'}\n'+
+			'.code_default, .code_default span {vertical-align:top; '+resultStyles.code_default+'}'+
 			'</style>'+
 			'<table class="code_table"">\n'+
 			padrow;
 
 		for (var i=0; i<lines.length; i++) {
 			line = lines[i];
-			console.log('\nhandle code block - line '+i+'\n' + line);
-
-			// Indentions
-			console.log('\nIndex of tab: ' + line.indexOf('\t', 0));
-			line = line.replace(/\t/g, '<span>&emsp;&emsp;</span>');
-
-			// Custom Words
-			for(var c=0; c<map.custom.length; c++){
-				line = replace_o_matic(line, map.custom[c].words, map.custom[c].style);
-			}
-
-			// Strings
-
-			// Comments
-
-			// Numbers
-			line = replace_o_matic(line, "0123456789".split(''), map.numbers);
-
-			// Punctuators
-			//line = replace_o_matic(line, list.punctuators, map.punctuators);
-
-			// Literals
-			line = replace_o_matic(line, list.literals, map.literals);
-
-			// Reserved
-			line = replace_o_matic(line, list.reserved, map.reserved);
-			
-			// Compile
-			result += '<tr>\n<td class="line_number">'+i+'</td>\n';
-			result += '<td class="code_default">'+line+'</td>\n</tr>\n';
+			console.log('\nmake code block - line '+i+'\n' + line);
+			result += '<tr>\n<td class="line_number">'+(i+1)+'</td>\n';
+			result += '<td class="code_default">'+makeCodeLine(line)+'</td>\n</tr>\n';
 		}
 		result += padrow;
 		result += '</table>';
@@ -138,16 +111,79 @@
 		return result;
 	}
 
-	function replace_o_matic(text, lookfor, newstyle){
-		var lf;
-		for(var w=0; w<lookfor.length; w++){
-			lfr = lookfor[w];
-			// if(lfr==='<') lfr = '&lt;';
-			// if(lfr==='>') lfr = '&gt;';
-			text = text.replace(lookfor[w], ('<span style="'+newstyle+'">'+lfr+'</span>'), 'g');
+	function makeCodeLine(line){
+		var curr = 0;
+		var start = 0;
+		var len = 0;
+		var newline = '';
+		function isSingleNext(lookfor){ return lookfor.join('').indexOf(line.substr(curr,1)) > -1; }
+		function isSequenceNext(lookfor){
+			var tlen, tval;
+			for(var n=0; n<lookfor.length; n++){
+				tval = lookfor[n];
+				tlen = tval.length;
+				if(tval === line.substr(curr,tlen)) return tlen;
+			}
+			return false;
 		}
-		return text;
+
+		while(curr < line.length){
+
+			// Indentions
+			if(isSingleNext(['\t'])){
+				newline += '<span>&emsp;&emsp;</span>';
+				curr ++;
+			}
+/*
+			// Strings
+			else if (line.substr(curr,1)==='"'){
+
+				curr++;
+			}
+
+			else if (line.substr(curr,1)==="'"){
+
+				curr++;
+			}*/
+			
+			// Comments
+			else if (isSequenceNext(["//"])){			
+				newline += makeSpanTag(line.substring(curr), styleMap.comments);
+				curr = line.length;
+			}
+
+			// Numbers
+			else if (isSingleNext("0123456789".split(''))){
+				start = curr;
+				if(isSingleNext("0123456789.".split(''))) curr++;
+				newline += makeSpanTag(line.substring(start,curr), styleMap.numbers);
+			}
+
+			// Custom Words
+
+			// Punctuators
+			else if (len = isSequenceNext(keywordLists.punctuators)){
+				newline += makeSpanTag(line.substr(curr,len), styleMap.punctuators);
+				curr+=len;
+			}
+
+			// Literals
+
+			// Reserved
+
+			// FALLTHROUGH
+
+			else {
+				newline += line.substr(curr,1);
+				curr++;
+			}
+		}
+
+		return newline;
 	}
+
+
+	function makeSpanTag(value, style){	return ('<span style="'+style+'">'+value+'</span>'); }
 
 	function unIndent(larr) {
 		var mincount = 999999;
