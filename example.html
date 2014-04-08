@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>syntaxalator.js example</title>
+<script src='syntaxalator.js'></script>
+<style>
+	* {
+		font-family: sans-serif;
+	}
+</style>
+</head>
+<body>
+	<h1>syntaxalator.js</h1>
+	<p>This is an example page to show off the syntax highlighting styles for syntaxalator.js.</p>
+	<p>This is a &lt;pre&gt; element with some example code:</p>
+	<pre>
+	function rounddec(num){
+		num = (num? num : 0);
+		var numsplit = num.toString().split(".");
+		if(numsplit.length == 1){
+			return numsplit;
+		} else {
+			return "" + numsplit[0] + "." + numsplit[1].substr(0,3);
+		}
+	}
+	</pre>
+	<p>And here is that same code with syntaxalator.js applied:</p>
+	<pre class='syntaxalator'>
+	function rounddec(num){
+		num = (num? num : 0);
+		var numsplit = num.toString().split(".");
+		if(numsplit.length == 1){
+			return numsplit;
+		} else {
+			return "" + numsplit[0] + "." + numsplit[1].substr(0,3);
+		}
+	}
+	</pre>
+</body>
+</html>
