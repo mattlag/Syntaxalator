@@ -18,7 +18,7 @@
 	function rounddec(num){
 		num = (num? num : 0);
 		var numsplit = num.toString().split(".");
-		if(numsplit.length == 1){
+		if(numsplit.length === 1){
 			return numsplit;
 		} else {
 			return "" + numsplit[0] + "." + numsplit[1].substr(0,3);
@@ -31,7 +31,7 @@
 	function rounddec(num){
 		num = (num? num : 0);
 		var numsplit = num.toString().split(".");
-		if(numsplit.length == 1){
+		if(numsplit.length === 1){
 			return numsplit;
 		} else {
 			return "" + numsplit[0] + "." + numsplit[1].substr(0,3);

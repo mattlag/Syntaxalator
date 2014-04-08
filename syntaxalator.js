@@ -8,7 +8,7 @@
 		"comments":"color:slategray;",
 		"punctuators":"color:red;",
 		"literals":"color:pink;",
-		"reserved":"color:orange;"
+		"reserved":"color:rgb(100,140,180); font-style:italic;"
 	};
 
 	// This array holds custom mappings, where 'words' is an array of target keywords
@@ -24,6 +24,7 @@
 	var resultStyles = {
 		"bounding_box":"border:1px solid rgb(230,238,240);",
 		"line_number":"background-color:rgb(230,238,240); color:rgb(180,188,190); font-size:.6em;",
+		"tab_vertical":"border-left:1px solid rgb(230,230,230)",
 		"code_default":"font-family:monospace; color:rgb(20,28,30); background-color:rgb(250,250,250);"
 	};
 
@@ -112,70 +113,109 @@
 	}
 
 	function makeCodeLine(line){
+		var newline = '';
 		var curr = 0;
 		var start = 0;
 		var len = 0;
-		var newline = '';
-		function isSingleNext(lookfor){ return lookfor.join('').indexOf(line.substr(curr,1)) > -1; }
-		function isSequenceNext(lookfor){
-			var tlen, tval;
-			for(var n=0; n<lookfor.length; n++){
-				tval = lookfor[n];
-				tlen = tval.length;
-				if(tval === line.substr(curr,tlen)) return tlen;
+		var nextword;
+		var trymax = 0;
+
+		function maxed() { trymax++; return trymax > 999; }
+
+		function isNext(lookfor){ return lookfor.join('').indexOf(line.substr(curr,1)) > -1; }
+
+		function getNextWord(){
+			console.log('\nGet Next Word - curr: '+curr+' on line: ' + line);
+			var s = curr;
+			var tchar;
+			while(curr < line.length){
+				if(maxed()) return (newline+"__STOPPED__TRYING__");
+				
+				curr++;
+				tchar = line.substr(curr,1);
+				//console.log('\t'+tchar);
+				if(keywordLists.punctuators.indexOf(tchar) > -1 || tchar === ' '){
+					return line.substring(s, curr);
+				}
 			}
-			return false;
+
+			return line.substring(s);
 		}
 
 		while(curr < line.length){
+			if(maxed()) return (newline+"__STOPPED__TRYING__");
+
+			// Single Character Starts a Chunk
+
+			// Space
+			if(isNext([' '])){
+				newline += ' ';
+				curr++;
+			}
 
 			// Indentions
-			if(isSingleNext(['\t'])){
-				newline += '<span>&emsp;&emsp;</span>';
+			else if(isNext(['\t'])){
+				newline += '<span style="'+resultStyles.tab_vertical+'">&emsp;&emsp;</span>';
 				curr ++;
 			}
-/*
+
 			// Strings
-			else if (line.substr(curr,1)==='"'){
-
-				curr++;
+			else if (line.substr(curr,1)==='"' || line.substr(curr,1)==="'"){
+				var quote = line.substr(curr,1);
+				start = curr;
+				while(curr < line.length){
+					if(maxed()) return (newline+"__STOPPED__TRYING__");
+					curr++;
+					if(line.substr(curr,1)===quote){
+						curr++;
+						newline += makeSpanTag(line.substring(start, curr), styleMap.strings);
+						break;
+					}
+				}
+				if(curr >= newline.length) newline += makeSpanTag(line.substring(start), styleMap.strings);
 			}
-
-			else if (line.substr(curr,1)==="'"){
-
-				curr++;
-			}*/
 			
 			// Comments
-			else if (isSequenceNext(["//"])){			
+			else if (isNext(["//"])){			
 				newline += makeSpanTag(line.substring(curr), styleMap.comments);
 				curr = line.length;
 			}
 
 			// Numbers
-			else if (isSingleNext("0123456789".split(''))){
+			else if (isNext("0123456789".split(''))){
 				start = curr;
-				if(isSingleNext("0123456789.".split(''))) curr++;
+				if(isNext("0123456789.".split(''))) curr++;
 				newline += makeSpanTag(line.substring(start,curr), styleMap.numbers);
 			}
 
-			// Custom Words
-
-			// Punctuators
-			else if (len = isSequenceNext(keywordLists.punctuators)){
-				newline += makeSpanTag(line.substr(curr,len), styleMap.punctuators);
-				curr+=len;
-			}
-
-			// Literals
-
-			// Reserved
-
-			// FALLTHROUGH
-
+			// Word Chunk
 			else {
-				newline += line.substr(curr,1);
-				curr++;
+				nextword = getNextWord();
+
+				// Custom Words
+				if(false){
+
+				}
+
+				// Punctuators
+				else if (keywordLists.punctuators.indexOf(nextword) > -1){
+					newline += makeSpanTag(nextword, styleMap.punctuators);
+				}
+
+				// Literals
+				else if (keywordLists.literals.indexOf(nextword) > -1){
+					newline += makeSpanTag(nextword, styleMap.literals);
+				}
+
+				// Reserved
+				else if (keywordLists.reserved.indexOf(nextword) > -1){
+					newline += makeSpanTag(nextword, styleMap.reserved);
+				}
+
+				// FALLTHROUGH
+				else {
+					newline += makeSpanTag(nextword, "");
+				}
 			}
 		}
 
