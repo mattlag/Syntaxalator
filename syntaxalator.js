@@ -6,7 +6,7 @@
 		"strings":"color:orange;",
 		"numbers":"color:orange;",
 		"comments":"color:slategray;",
-		"punctuators":"color:red;",
+		"punctuators":"color:blue;",
 		"literals":"color:pink;",
 		"reserved":"color:rgb(100,140,180); font-style:italic;"
 	};
@@ -31,10 +31,10 @@
 	//http://es5.github.io/#x7.6.1
 	var keywordLists = {
 		"reserved":"break,do,instanceof,typeof,case,else,new,var,catch,finally,return,void,continue,for,switch,while,debugger,function,this,with,default,if,throw,delete,in,try,class,enum,extends,super,const,export,import,implements,let,private,public,yield,interface,package,protected,static".split(','),
-		"punctuators":"{,},(,),[,],.,;,<,>,<=,>=,==,!=,===,!==,+,-,*,%,++,--,<<,>>,>>>,&,|,^,!,~,&&,||,?,:,=,+=,-=,*=,%=,<<=,>>=,>>>=,&=,|=,^=".split(','),
+		"punctuators":['===','==','=','<<=','<<','<=','<','>>>=','>>>','>>=','>>','>=','>','!==','!=','!','+=','++','+','-=','--','-','&=','&&','&','^=','^','|=','||','|','*=','*','%=','%','{','}','(',')','[',']','.',',',';','~','?',':'],
 		"literals":"null,true,false".split(',')
 	};
-	keywordLists.punctuators.push(',');
+	keywordLists.punctuators.reverse();
 
 	// Wait for the DOM
 	var iid = setInterval((function(){
@@ -88,12 +88,13 @@
 		var result = '';
 
 
-		var padrow = '<tr><td class="line_number" style="height:.1em;"></td><td class="code_default"></td></tr>\n';
+		var padrow = '<tr><td class="line_number" style="height:1em;"></td><td class="code_default" style="height:1em;"></td></tr>\n';
 		result += '<style>'+
 			'.code_table {border-collapse:collapse; '+resultStyles.bounding_box+'}\n'+
-			'.code_table td {padding:4px 12px 4px 8px;}\n'+
-			'.line_number {vertical-align:top; '+resultStyles.line_number+'}\n'+
-			'.code_default, .code_default span {vertical-align:top; '+resultStyles.code_default+'}'+
+			'.code_table td {padding:0px 18px 0px 8px; height:2em; margin:0px;}\n'+
+			'.line_number {vertical-align:top; text-align:right; height:2em; '+resultStyles.line_number+'}\n'+
+			'.code_default, .code_default span {vertical-align:top; height:2em; padding:4px 0px; '+resultStyles.code_default+'}'+
+			'.code_default {padding-left:16px !important;}'+
 			'</style>'+
 			'<table class="code_table"">\n'+
 			padrow;
@@ -115,31 +116,39 @@
 	function makeCodeLine(line){
 		var newline = '';
 		var curr = 0;
-		var start = 0;
-		var len = 0;
 		var nextword;
 		var trymax = 0;
+		var wordstops = keywordLists.punctuators;
+		wordstops.push(' ');
 
 		function maxed() { trymax++; return trymax > 999; }
 
-		function isNext(lookfor){ return lookfor.join('').indexOf(line.substr(curr,1)) > -1; }
+		function isWordNext(lookfor){ return (line.substr(curr,lookfor.length) === lookfor); }
 
-		function getNextWord(){
-			console.log('\nGet Next Word - curr: '+curr+' on line: ' + line);
-			var s = curr;
-			var tchar;
+		function isNext(lookforarr){
+			for(var i=0; i<lookforarr.length; i++){
+				if(isWordNext(lookforarr[i])) return lookforarr[i].length;
+			}
+
+			return false;
+		}
+
+		function getNextUntil(stops, inclusive){
+			var start = curr;
+			var len;
 			while(curr < line.length){
 				if(maxed()) return (newline+"__STOPPED__TRYING__");
 				
-				curr++;
-				tchar = line.substr(curr,1);
-				//console.log('\t'+tchar);
-				if(keywordLists.punctuators.indexOf(tchar) > -1 || tchar === ' '){
-					return line.substring(s, curr);
+				len = isNext(stops);
+				if(len){
+					if(inclusive) curr+=len;
+					if(start === curr) curr++;
+					return line.substring(start, curr);
 				}
+				curr++;
 			}
 
-			return line.substring(s);
+			return line.substring(start);
 		}
 
 		while(curr < line.length){
@@ -148,35 +157,27 @@
 			// Single Character Starts a Chunk
 
 			// Space
-			if(isNext([' '])){
+			if(isWordNext(' ')){
 				newline += ' ';
 				curr++;
 			}
 
 			// Indentions
-			else if(isNext(['\t'])){
-				newline += '<span style="'+resultStyles.tab_vertical+'">&emsp;&emsp;</span>';
+			else if(isWordNext('\t')){
+				newline += '<span style="height:2em; '+resultStyles.tab_vertical+'">&emsp;&emsp;</span>';
 				curr ++;
 			}
 
 			// Strings
 			else if (line.substr(curr,1)==='"' || line.substr(curr,1)==="'"){
 				var quote = line.substr(curr,1);
-				start = curr;
-				while(curr < line.length){
-					if(maxed()) return (newline+"__STOPPED__TRYING__");
-					curr++;
-					if(line.substr(curr,1)===quote){
-						curr++;
-						newline += makeSpanTag(line.substring(start, curr), styleMap.strings);
-						break;
-					}
-				}
-				if(curr >= newline.length) newline += makeSpanTag(line.substring(start), styleMap.strings);
+				curr++;
+				nextword = getNextUntil(quote, true);
+				newline += makeSpanTag(quote+nextword, styleMap.strings);
 			}
 			
 			// Comments
-			else if (isNext(["//"])){			
+			else if (isWordNext("//")){			
 				newline += makeSpanTag(line.substring(curr), styleMap.comments);
 				curr = line.length;
 			}
@@ -184,13 +185,13 @@
 			// Numbers
 			else if (isNext("0123456789".split(''))){
 				start = curr;
-				if(isNext("0123456789.".split(''))) curr++;
+				while(isNext("0123456789.".split(''))) curr++;
 				newline += makeSpanTag(line.substring(start,curr), styleMap.numbers);
 			}
 
 			// Word Chunk
 			else {
-				nextword = getNextWord();
+				nextword = getNextUntil(wordstops, false);
 
 				// Custom Words
 				if(false){
@@ -255,4 +256,72 @@
 })();
 
 
+/*
 
+
+
+
+
+
+['===','==','=','<<=','<<','<=','<','>>>=','>>>','>>=','>>','>=','>','!==','!=','!','+=','++','+','-=','--','-','&=','&&','&','^=','^','|=','||','|','*=','*','%=','%','{','}','(',')','[',']','.',',',';','~','?',':'];
+
+
+
+
+
+
+
+
+
+
+
+===
+==
+=
+<<=
+<<
+<=
+<
+>>>=
+>>>
+>>=
+>>
+>=
+>
+!==
+!=
+!
++=
+++
++
+-=
+--
+-
+&=
+&&
+&
+^=
+^
+|=
+||
+|
+*=
+*
+%=
+%
+{
+}
+(
+)
+[
+]
+.
+,
+;
+~
+?
+:
+
+
+
+*/
