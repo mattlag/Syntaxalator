@@ -14,28 +14,80 @@
 	<p>This is an example page to show off the syntax highlighting styles for syntaxalator.js.</p>
 	<p>This is a &lt;pre&gt; element with some example code:</p>
 	<pre>
-	// This is an improved rounding function
-	function rounddec(num){
-		num = (num? num : 0);
-		var numsplit = num.toString().split(".");
-		if(numsplit.length === 1){
-			return numsplit;
-		} else {
-			return "" + numsplit[0] + "." + numsplit[1].substr(0,3);
+	/*
+		This is an improved rounding function
+		that allows for specifying decimal
+		place precision.
+	*/
+	function round(num, places){
+		// Set up variables
+		num = num || 0;
+		num += '';
+		places = parseInt(places) || 3;
+		var split = num.split('.');
+		if(split.length === 1) return num*1;
+		var left = split[0]*=1;
+		var right = split[1]+='';
+
+		// Check for decimal = 0
+		if(right*1 === 0) return left;
+
+		// Turn decimal into a whole number 'places' long plus one decimal point
+		if(right.length > places){
+			right = (right.substring(0,places)+'.'+right.substring(places));
+			right = ''+Math.round(right*1);
+			if(right*1 === 0) {
+				// decimal places were rounded down to 0
+				return left;
+			} else if (right.length > places){
+				// decimal places were rounded up, carry the 1
+				return (left + 1);
+			} else {
+				// rounded somewhere in between, pad zeros
+				while(right.length < places) right = '0'+right;
+			}
 		}
+
+		return (''+left+'.'+right)*1;
 	}
 	</pre>
 	<p>And here is that same code with syntaxalator.js applied:</p>
 	<pre class='syntaxalator'>
-	// This is an improved rounding function
-	function rounddec(num){
-		num = (num? num : 0);
-		var numsplit = num.toString().split(".");
-		if(numsplit.length === 1){
-			return numsplit;
-		} else {
-			return "" + numsplit[0] + "." + numsplit[1].substr(0,3);
+	/*
+		This is an improved rounding function
+		that allows for specifying decimal
+		place precision.
+	*/
+	function round(num, places){
+		// Set up variables
+		num = num || 0;
+		num += '';
+		places = parseInt(places) || 3;
+		var split = num.split('.');
+		if(split.length === 1) return num*1;
+		var left = split[0]*=1;
+		var right = split[1]+='';
+
+		// Check for decimal = 0
+		if(right*1 === 0) return left;
+
+		// Turn decimal into a whole number 'places' long plus one decimal point
+		if(right.length > places){
+			right = (right.substring(0,places)+'.'+right.substring(places));
+			right = ''+Math.round(right*1);
+			if(right*1 === 0) {
+				// decimal places were rounded down to 0
+				return left;
+			} else if (right.length > places){
+				// decimal places were rounded up, carry the 1
+				return (left + 1);
+			} else {
+				// rounded somewhere in between, pad zeros
+				while(right.length < places) right = '0'+right;
+			}
 		}
+
+		return (''+left+'.'+right)*1;
 	}
 	</pre>
 </body>
