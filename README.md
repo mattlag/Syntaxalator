@@ -1,5 +1,12 @@
 # syntaxalator.js
-A small JavaScript syntax highlighter for posting code examples to web pages.  Paste your example code into a <pre> tag with an class='syntaxalator', and include syntaxalator.js on the web page.  Syntaxalator will look for those <pre> tags, and replace the plain text JavaScript with a pretty syntax-highligted and line-numbered <div>.
+A small JavaScript syntax highlighter for posting code examples to web pages.  Paste your example code into a &lt;pre&gt; tag with an class='syntaxalator', and include syntaxalator.js on the web page.  Syntaxalator will look for those &lt;pre&gt; tags, and replace the plain text JavaScript with a pretty syntax-highligted and line-numbered &lt;div&gt;.
+
+Not crazy-robust at the moment, targeted at short code examples.  If syntax highlighting fails, the code in the origional tag will be shown.
+
+### What it doesn't hilight so far:
+Cutting-edge ES6 Stuff
+Non-decimal Numbers
+Regular Expressions
 
 ## License
 Copyright (C) 2014 Matthew LaGrandeur, released under [GPL 3.0](https://www.gnu.org/licenses/gpl-3.0-standalone.html)
