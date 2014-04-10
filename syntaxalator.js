@@ -8,7 +8,8 @@
 		"comments":		"color:rgb(150,171,195);",
 		"punctuators":	"color:rgb(0,160,210);",
 		"literals":		"color:rgb(0,105,24);",
-		"reserved":		"color:rgb(0,0,153); font-style:italic;"
+		"reserved":		"color:rgb(0,0,153); font-style:italic;",
+		"variablenames":"color:magenta;"
 	};
 
 	// This array holds custom mappings, where 'words' is an array of target keywords
@@ -39,7 +40,8 @@
 	var keywordLists = {
 		"reserved":"break,do,instanceof,typeof,case,else,new,var,catch,finally,return,void,continue,for,switch,while,debugger,function,this,with,default,if,throw,delete,in,try,class,enum,extends,super,const,export,import,implements,let,private,public,yield,interface,package,protected,static".split(','),
 		"punctuators":['===','==','=','<<=','<<','<=','<','>>>=','>>>','>>=','>>','>=','>','!==','!=','!','+=','++','+','-=','--','-','&=','&&','&','^=','^','|=','||','|','*=','*','%=','%','{','}','(',')','[',']','.',',',';','~','?',':'],
-		"literals":"null,true,false".split(',')
+		"literals":"null,true,false".split(','),
+		"variablenames":[]
 	};
 	keywordLists.punctuators.reverse();
 
@@ -73,6 +75,7 @@
 
 		// Loop through and make
 		var prettycode, newnode;
+		keywordLists.variablenames = [];
 		for(var t=0; t<targets.length; t++) {
 			console.log('\nHandling Code Block\n'+targets[t].textContent);
 			prettycode = makeCodeBlock(targets[t].textContent);
@@ -175,6 +178,15 @@
 			curr += nextword.length;
 		}
 
+		if (line.indexOf('function') > -1){
+			var funvars = line.substring(line.indexOf('function'), line.indexOf(')'));
+			funvars = funvars.substring(funvars.indexOf('(')+1);
+			funvars = funvars.replace(/\s+/g, '');
+			funvars = funvars.split(',');
+			for (var i=0; i<funvars.length; i++) keywordLists.variablenames.push(funvars[i]);
+
+		}
+
 		while(curr < line.length){
 			if(maxed()) return (newline+"__STOPPED__TRYING__");
 
@@ -229,10 +241,23 @@
 			else {
 				nextword = getNextUntil(wordstops, false);
 
-				if(nextword === '<') console.log("< FOUND FROM NEXTWORD");
+				// variable names
+				if(nextword === 'var'){
+					newline += makeSpanTag(nextword, styleMap.reserved);
+					if(isWordNext(' ')){
+						newline += ' ';
+						curr++;
+						nextword = getNextUntil(wordstops, false);
+						console.log('\nFound Variable Name ' + nextword);
+						keywordLists.variablenames.push(nextword);
+						newline += makeSpanTag(nextword, styleMap.variablenames);
+					}
+				} else if (keywordLists.variablenames.indexOf(nextword) > -1){
+					newline += makeSpanTag(nextword, styleMap.variablenames);
+				}
 
 				// Punctuators
-				if (keywordLists.punctuators.indexOf(nextword) > -1){
+				else if (keywordLists.punctuators.indexOf(nextword) > -1){
 					newline += makeSpanTag(nextword, styleMap.punctuators);
 				}
 

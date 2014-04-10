@@ -24,10 +24,10 @@
 		num = num || 0;
 		num += '';
 		places = parseInt(places) || 3;
-		var split = num.split('.');
-		if(split.length === 1) return num*1;
-		var left = split[0]*=1;
-		var right = split[1]+='';
+		var splitarr = num.split('.');
+		if(splitarr.length === 1) return num*1;
+		var left = splitarr[0]*=1;
+		var right = splitarr[1]+='';
 
 		// Check for decimal = 0
 		if(right*1 === 0) return left;
@@ -63,10 +63,10 @@
 		num = num || 0;
 		num += '';
 		places = parseInt(places) || 3;
-		var split = num.split('.');
-		if(split.length === 1) return num*1;
-		var left = split[0]*=1;
-		var right = split[1]+='';
+		var splitarr = num.split('.');
+		if(splitarr.length === 1) return num*1;
+		var left = splitarr[0]*=1;
+		var right = splitarr[1]+='';
 
 		// Check for decimal = 0
 		if(right*1 === 0) return left;
