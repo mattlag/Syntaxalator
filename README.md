@@ -3,9 +3,13 @@ A small JavaScript syntax highlighter for posting code examples to web pages.  P
 
 Not crazy-robust at the moment, targeted at short code examples.  If syntax highlighting fails, the code in the origional tag will be shown.
 
+See [example.html](example.html) for a running sample.
+
 ### What it doesn't hilight so far:
 Cutting-edge ES6 Stuff
+
 Non-decimal Numbers
+
 Regular Expressions
 
 ## License
