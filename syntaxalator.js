@@ -99,16 +99,18 @@
 		var result = '';
 
 
-		var padrow = '<tr><td class="line_number" style="height:1em;"></td><td class="code_default" style="height:1em;"></td></tr>\n';
 		result += '<style>'+
 			'.code_table {border-collapse:collapse; '+resultStyles.bounding_box+'}\n'+
 			'.code_table td {padding:0px 18px 0px 8px; height:2em; margin:0px;}\n'+
 			'.line_number {vertical-align:top; text-align:right; height:2em; line-height:2em; '+resultStyles.line_number+'}\n'+
+			'.line_number div:hover {text-decoration:underline; cursor:pointer;}'+
 			'.code_default, .code_default span {vertical-align:top; height:2em; padding:4px 0px; '+resultStyles.code_default+'}'+
 			'.code_default {padding-left:16px !important;}'+
+			'.smallright {display:block; float:right; font-size:.6em; border:none; background-color:transparent; color:rgb(230,238,240); padding:0px; margin:12px 0px;}'+
 			'</style>'+
 			'<table class="code_table"">\n'+
-			padrow;
+			'<tr><td class="line_number" style="height:1em;"></td>\n'+
+			'<td class="line_number" style="background-color:transparent;"><div>copy code</div></td></tr>\n';
 
 		var multilinecomment = false;
 		for (var i=0; i<lines.length; i++) {
@@ -120,8 +122,9 @@
 			if(line.indexOf('*/')>-1) multilinecomment = false;
 			result += '<td class="code_default">'+makeCodeLine(line, multilinecomment)+'</td>\n</tr>\n';
 		}
-		result += padrow;
-		result += '</table>';
+		result += '<tr><td class="line_number" style="height:1em;"></td>\n'+
+			'<td class="line_number" style="background-color:transparent;"><div>syntaxalator.js</div></td></tr>\n'+
+			'</table>';
 
 		//console.log("Make code block generated\n"+result);
 
