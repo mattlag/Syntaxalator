@@ -3,13 +3,13 @@
 
 	// These entries will style the default elements of JavaScript
 	var styleMap = {
-		"strings":		"color:rgb(180,74,0);",
-		"numbers":		"color:rgb(204,0,122);",
-		"comments":		"color:rgb(150,171,195);",
-		"punctuators":	"color:rgb(0,160,210);",
-		"literals":		"color:rgb(0,105,24);",
-		"reserved":		"color:rgb(0,0,153); font-style:italic;",
-		"variablenames":"color:magenta;"
+		"strings": "color:rgb(180,74,0);",
+		"numbers": "color:rgb(204,0,122);",
+		"comments": "color:rgb(150,171,195);",
+		"punctuators": "color:rgb(0,190,210);",
+		"literals": "color:rgb(0,105,24);",
+		"reserved": "color:rgb(0,0,153); font-style:italic;",
+		"variablenames" : "color:rgb(170,100,0);"
 	};
 
 	// This array holds custom mappings, where 'words' is an array of target keywords
@@ -17,11 +17,11 @@
 	styleMap.custom = [
 		{
 			"words": ["function", "prototype"],
-			"style": "color:rgb(0,0,153); font-style:italic; font-weight:bold;"
+			"style": "color:rgb(90,0,190); font-style:italic; font-weight:bold;"
 		},
 		{
 			"words": ["return"],
-			"style": "color:rgb(0,102,0);"
+			"style": "color:rgb(0,150,0);"
 		},
 		{
 			"words": [";"],
@@ -81,8 +81,12 @@
 			prettycode = makeCodeBlock(targets[t].textContent);
 			newnode = document.createElement('div');
 			newnode.innerHTML = prettycode;
-			document.body.insertBefore(newnode, targets[t]);
-			targets[t].style.display = 'none';
+			try {
+				document.body.insertBefore(newnode, targets[t]);
+				targets[t].style.display = 'none';
+			} catch (e){
+				targets[t].innerHTML = prettycode;
+			}
 		}
 	}
 
@@ -100,9 +104,9 @@
 
 
 		result += '<style>'+
-			'.code_table {border-collapse:collapse; '+resultStyles.bounding_box+'}\n'+
+			'.code_table {border-collapse:collapse; width:100%; '+resultStyles.bounding_box+'}\n'+
 			'.code_table td {padding:0px 18px 0px 8px; height:2em; margin:0px;}\n'+
-			'.line_number {vertical-align:top; text-align:right; height:2em; line-height:2em; '+resultStyles.line_number+'}\n'+
+			'.line_number {vertical-align:middle; text-align:right; height:2em; line-height:2em; '+resultStyles.line_number+'}\n'+
 			'.line_number div:hover {text-decoration:underline; cursor:pointer;}'+
 			'.code_default, .code_default span {vertical-align:top; height:2em; padding:4px 0px; '+resultStyles.code_default+'}'+
 			'.code_default {padding-left:16px !important;}'+
@@ -110,7 +114,8 @@
 			'</style>'+
 			'<table class="code_table"">\n'+
 			'<tr><td class="line_number" style="height:1em;"></td>\n'+
-			'<td class="line_number" style="background-color:transparent;"><div>copy code</div></td></tr>\n';
+			'<td class="line_number" style="background-color:transparent;">&nbsp;</td></tr>\n';
+			// '<td class="line_number" style="background-color:transparent;"><div>copy code</div></td></tr>\n';
 
 		var multilinecomment = false;
 		for (var i=0; i<lines.length; i++) {
@@ -123,7 +128,7 @@
 			result += '<td class="code_default">'+makeCodeLine(line, multilinecomment)+'</td>\n</tr>\n';
 		}
 		result += '<tr><td class="line_number" style="height:1em;"></td>\n'+
-			'<td class="line_number" style="background-color:transparent;"><div>syntaxalator.js</div></td></tr>\n'+
+			'<td style="text-align:right;"><a class="line_number" style="background-color:transparent;" href="http://www.mattlag.com/syntaxalator" target=_new>syntaxalator.js</a></td></tr>\n'+
 			'</table>';
 
 		//console.log("Make code block generated\n"+result);
