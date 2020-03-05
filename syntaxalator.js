@@ -128,7 +128,7 @@
 			result += '<td class="code_default">'+makeCodeLine(line, multilinecomment)+'</td>\n</tr>\n';
 		}
 		result += '<tr><td class="line_number" style="height:1em;"></td>\n'+
-			'<td style="text-align:right;"><a class="line_number" style="background-color:transparent;" href="http://www.mattlag.com/syntaxalator" target=_new>syntaxalator.js</a></td></tr>\n'+
+			'<td style="text-align:right;"><a class="line_number" style="background-color:transparent;" href="https://www.mattlag.com/syntaxalator" target=_new>syntaxalator.js</a></td></tr>\n'+
 			'</table>';
 
 		//console.log("Make code block generated\n"+result);
