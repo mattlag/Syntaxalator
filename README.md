@@ -9,15 +9,13 @@ the code in the original tag will be shown.
 
 See [example.html](example.html) for a running sample.
 
-### What it doesn't hilight so far:
-Cutting-edge ES6 Stuff
-
-Non-decimal Numbers
-
-Regular Expressions
+### What it doesn't highlight so far:
+ - Cutting-edge ES6 Stuff
+ - Non-decimal Numbers
+ - Regular Expressions
 
 ## License
-Copyright (C) 2014 Matthew LaGrandeur, released under [GPL 3.0](https://www.gnu.org/licenses/gpl-3.0-standalone.html)
+Copyright (C) 2020 Matthew LaGrandeur, released under [GPL 3.0](https://www.gnu.org/licenses/gpl-3.0-standalone.html)
 
 ## Author
 | ![Matthew LaGrandeur's picture](https://1.gravatar.com/avatar/f6f7b963adc54db7e713d7bd5f4903ec?s=70) |

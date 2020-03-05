@@ -1,5 +1,5 @@
 (function(){
-	console.log('\nsyntaxalator.js');
+	// console.log('\nsyntaxalator.js');
 
 	// These entries will style the default elements of JavaScript
 	var styleMap = {
@@ -77,7 +77,7 @@
 		var prettycode, newnode;
 		keywordLists.variablenames = [];
 		for(var t=0; t<targets.length; t++) {
-			console.log('\nHandling Code Block\n'+targets[t].textContent);
+			// console.log('\nHandling Code Block\n'+targets[t].textContent);
 			prettycode = makeCodeBlock(targets[t].textContent);
 			newnode = document.createElement('div');
 			newnode.innerHTML = prettycode;
@@ -128,7 +128,7 @@
 			result += '<td class="code_default">'+makeCodeLine(line, multilinecomment)+'</td>\n</tr>\n';
 		}
 		result += '<tr><td class="line_number" style="height:1em;"></td>\n'+
-			'<td style="text-align:right;"><a class="line_number" style="background-color:transparent;" href="https://www.mattlag.com/syntaxalator" target=_new>syntaxalator.js</a></td></tr>\n'+
+			'<td style="text-align:right;"><a class="line_number" style="background-color:transparent;" href="https://www.mattlag.com/syntaxalator" target="_new">syntaxalator.js</a></td></tr>\n'+
 			'</table>';
 
 		//console.log("Make code block generated\n"+result);
@@ -256,7 +256,7 @@
 						newline += ' ';
 						curr++;
 						nextword = getNextUntil(wordstops, false);
-						console.log('\nFound Variable Name ' + nextword);
+						// console.log('\nFound Variable Name ' + nextword);
 						keywordLists.variablenames.push(nextword);
 						newline += makeSpanTag(nextword, styleMap.variablenames);
 					}
@@ -322,74 +322,3 @@
 		return larr;
 	}
 })();
-
-
-/*
-
-
-
-
-
-
-['===','==','=','<<=','<<','<=','<','>>>=','>>>','>>=','>>','>=','>','!==','!=','!','+=','++','+','-=','--','-','&=','&&','&','^=','^','|=','||','|','*=','*','%=','%','{','}','(',')','[',']','.',',',';','~','?',':'];
-
-
-
-
-
-
-
-
-
-
-
-===
-==
-=
-<<=
-<<
-<=
-<
->>>=
->>>
->>=
->>
->=
->
-!==
-!=
-!
-+=
-++
-+
--=
---
--
-&=
-&&
-&
-^=
-^
-|=
-||
-|
-*=
-*
-%=
-%
-{
-}
-(
-)
-[
-]
-.
-,
-;
-~
-?
-:
-
-
-
-*/
